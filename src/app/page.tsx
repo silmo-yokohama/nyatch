@@ -1,101 +1,205 @@
-import Image from "next/image";
+import React from 'react';
+import {
+  Cat,
+  Mouse,
+  Target,
+  Puzzle,
+  PlayCircle,
+  AlertTriangle,
+  Monitor,
+  Smartphone,
+  Tablet,
+  Info
+} from 'lucide-react';
 
-export default function Home() {
+// Containerコンポーネントの型定義
+type ContainerProps = {
+  children: React.ReactNode;
+  className?: string;
+};
+
+const Container = ({ children, className = '' }: ContainerProps) => {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${className}`}>
+      {children}
+    </div>
+  );
+};
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+// GameCardコンポーネントの型定義
+type GameCardProps = {
+  title: string;
+  description: string;
+  icon: React.ElementType;  // Lucideアイコンコンポーネント用
+  color: string;
+};
+
+const GameCard = ({ title, description, icon: Icon, color }: GameCardProps) => {
+  return (
+    <div className="transform transition-all duration-300 hover:scale-105">
+      <div className={`p-6 rounded-2xl shadow-lg bg-white border-2 ${color} hover:shadow-xl`}>
+        <div className="flex items-center mb-4">
+          <div className={`p-3 rounded-full ${color.replace('border', 'bg')} bg-opacity-20`}>
+            <Icon className={`w-8 h-8 ${color.replace('border', 'text')}`} />
+          </div>
+          <h3 className="ml-3 text-xl font-bold text-gray-800">
+            {title}
+          </h3>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+        <p className="text-gray-600">
+          {description}
+        </p>
+        <button className={`mt-4 px-4 py-2 rounded-full ${color.replace('border', 'bg')} text-white font-medium transform transition-transform duration-200 hover:scale-105 active:scale-95`}>
+          遊んでみる
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// InstructionCardコンポーネントの型定義
+type InstructionCardProps = {
+  title: string;
+  children: React.ReactNode;
+  icon: React.ElementType;  // Lucideアイコンコンポーネント用
+};
+
+const InstructionCard = ({ title, children, icon: Icon }: InstructionCardProps) => {
+  return (
+    <div className="bg-white/90 rounded-xl p-6 shadow-lg backdrop-blur-sm">
+      <div className="flex items-center mb-4">
+        <Icon className="w-6 h-6 text-purple-500" />
+        <h3 className="ml-3 text-xl font-bold text-gray-800">{title}</h3>
+      </div>
+      {children}
+    </div>
+  );
+};
+
+// gameModesの型定義
+type GameMode = {
+  id: string;
+  title: string;
+  description: string;
+  icon: React.ElementType;
+  color: string;
+};
+
+const HomePage = () => {
+  const gamesModes: GameMode[] = [
+    {
+      id: 'mouse',
+      title: 'マウスチェイス',
+      description: '画面上を動き回るマウスを追いかけよう！',
+      icon: Mouse,
+      color: 'border-pink-500',
+    },
+    {
+      id: 'laser',
+      title: 'レーザーポインター',
+      description: '赤い光を追いかけてみよう！',
+      icon: Target,
+      color: 'border-purple-500',
+    },
+    {
+      id: 'butterfly',
+      title: '蝶々チェイス',
+      description: 'ひらひら舞う蝶々を捕まえよう！',
+      icon: Puzzle,
+      color: 'border-blue-500',
+    },
+  ];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50">
+      {/* ヘッダーセクション */}
+      <header className="py-8 bg-white/80 backdrop-blur-sm">
+        <Container>
+          <div className="flex items-center justify-center">
+            <Cat className="w-12 h-12 text-pink-500 animate-bounce" />
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-transparent ml-4">
+              Nyatch
+            </h1>
+          </div>
+          <p className="mt-4 text-xl text-center text-gray-600 font-medium">
+            猫ちゃんと一緒に遊ぼう！
+          </p>
+        </Container>
+      </header>
+
+      {/* 遊び方と注意事項 */}
+      <Container className="py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <InstructionCard title="遊び方" icon={PlayCircle}>
+            <ul className="space-y-3 text-gray-600">
+              <li className="flex items-start">
+                <Info className="w-5 h-5 text-blue-500 mt-0.5 mr-2 flex-shrink-0" />
+                <span>好きなモードを選んで遊んでみましょう</span>
+              </li>
+              <li className="flex items-start">
+                <Info className="w-5 h-5 text-blue-500 mt-0.5 mr-2 flex-shrink-0" />
+                <span>モードによって遊び方が異なります</span>
+              </li>
+              <li className="flex items-start">
+                <Info className="w-5 h-5 text-blue-500 mt-0.5 mr-2 flex-shrink-0" />
+                <span>注意事項をよく読んでから遊んでください</span>
+              </li>
+            </ul>
+          </InstructionCard>
+
+          <InstructionCard title="注意事項" icon={AlertTriangle}>
+            <ul className="space-y-3 text-gray-600">
+              <li className="flex items-start">
+                <div className="flex gap-2 mr-2 flex-shrink-0">
+                  <Monitor className="w-5 h-5 text-green-500" />
+                  <Tablet className="w-5 h-5 text-green-500" />
+                </div>
+                <span>PC又はタブレットに最適化されています</span>
+              </li>
+              <li className="flex items-start">
+                <AlertTriangle className="w-5 h-5 text-orange-500 mt-0.5 mr-2 flex-shrink-0" />
+                <span>遊ぶときはモニターが倒れたりモノが壊れないように注意してください</span>
+              </li>
+              <li className="flex items-start">
+                <Smartphone className="w-5 h-5 text-red-500 mt-0.5 mr-2 flex-shrink-0" />
+                <span>スマートフォンではあまり遊んでくれないと思います</span>
+              </li>
+            </ul>
+          </InstructionCard>
+        </div>
+      </Container>
+
+      {/* ゲームモード一覧 */}
+      <Container className="py-8">
+        <section>
+          <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">
+            遊べるモード
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {gamesModes.map((game) => (
+              <GameCard
+                key={game.id}
+                title={game.title}
+                description={game.description}
+                icon={game.icon}
+                color={game.color}
+              />
+            ))}
+          </div>
+        </section>
+      </Container>
+
+      {/* フッター */}
+      <footer className="py-6 bg-white/80 backdrop-blur-sm">
+        <Container>
+          <p className="text-center text-gray-600">
+            © {new Date().getFullYear()} Nyatch - 猫ちゃんのための遊び場
+            <Cat className="inline-block w-4 h-4 ml-2 text-pink-500" />
+          </p>
+        </Container>
       </footer>
     </div>
   );
-}
+};
+
+export default HomePage;
