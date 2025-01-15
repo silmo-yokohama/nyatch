@@ -8,82 +8,12 @@ import {
   AlertTriangle,
   Monitor,
   Smartphone,
-  Tablet,
   Info
 } from 'lucide-react';
-
-// Containerコンポーネントの型定義
-type ContainerProps = {
-  children: React.ReactNode;
-  className?: string;
-};
-
-const Container = ({ children, className = '' }: ContainerProps) => {
-  return (
-    <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${className}`}>
-      {children}
-    </div>
-  );
-};
-
-// GameCardコンポーネントの型定義
-type GameCardProps = {
-  title: string;
-  description: string;
-  icon: React.ElementType;  // Lucideアイコンコンポーネント用
-  color: string;
-};
-
-const GameCard = ({ title, description, icon: Icon, color }: GameCardProps) => {
-  return (
-    <div className="transform transition-all duration-300 hover:scale-105">
-      <div className={`p-6 rounded-2xl shadow-lg bg-white border-2 ${color} hover:shadow-xl`}>
-        <div className="flex items-center mb-4">
-          <div className={`p-3 rounded-full ${color.replace('border', 'bg')} bg-opacity-20`}>
-            <Icon className={`w-8 h-8 ${color.replace('border', 'text')}`} />
-          </div>
-          <h3 className="ml-3 text-xl font-bold text-gray-800">
-            {title}
-          </h3>
-        </div>
-        <p className="text-gray-600">
-          {description}
-        </p>
-        <button className={`mt-4 px-4 py-2 rounded-full ${color.replace('border', 'bg')} text-white font-medium transform transition-transform duration-200 hover:scale-105 active:scale-95`}>
-          遊んでみる
-        </button>
-      </div>
-    </div>
-  );
-};
-
-// InstructionCardコンポーネントの型定義
-type InstructionCardProps = {
-  title: string;
-  children: React.ReactNode;
-  icon: React.ElementType;  // Lucideアイコンコンポーネント用
-};
-
-const InstructionCard = ({ title, children, icon: Icon }: InstructionCardProps) => {
-  return (
-    <div className="bg-white/90 rounded-xl p-6 shadow-lg backdrop-blur-sm">
-      <div className="flex items-center mb-4">
-        <Icon className="w-6 h-6 text-purple-500" />
-        <h3 className="ml-3 text-xl font-bold text-gray-800">{title}</h3>
-      </div>
-      {children}
-    </div>
-  );
-};
-
-// gameModesの型定義
-type GameMode = {
-  id: string;
-  title: string;
-  description: string;
-  icon: React.ElementType;
-  color: string;
-};
+import { Container } from '@/components/layout/Container';
+import { GameCard } from '@/components/cards/GameCard';
+import { InstructionCard } from '@/components/cards/InstructionCard';
+import type { GameMode } from '@/types/game';
 
 const HomePage = () => {
   const gamesModes: GameMode[] = [
@@ -129,9 +59,9 @@ const HomePage = () => {
 
       {/* 遊び方と注意事項 */}
       <Container className="py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="flex flex-col gap-6">
           <InstructionCard title="遊び方" icon={PlayCircle}>
-            <ul className="space-y-3 text-gray-600">
+            <ul className="space-y-3 mt-4 text-gray-600">
               <li className="flex items-start">
                 <Info className="w-5 h-5 text-blue-500 mt-0.5 mr-2 flex-shrink-0" />
                 <span>好きなモードを選んで遊んでみましょう</span>
@@ -148,11 +78,10 @@ const HomePage = () => {
           </InstructionCard>
 
           <InstructionCard title="注意事項" icon={AlertTriangle}>
-            <ul className="space-y-3 text-gray-600">
+            <ul className="mt-4 space-y-3 text-gray-600">
               <li className="flex items-start">
                 <div className="flex gap-2 mr-2 flex-shrink-0">
                   <Monitor className="w-5 h-5 text-green-500" />
-                  <Tablet className="w-5 h-5 text-green-500" />
                 </div>
                 <span>PC又はタブレットに最適化されています</span>
               </li>
