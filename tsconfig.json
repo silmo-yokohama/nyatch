@@ -20,7 +20,24 @@
     ],
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+
+    "noUnusedLocals": true, // 未使用のローカル変数をエラーとして報告
+    "noUnusedParameters": true, // 未使用のパラメータをエラーとして報告
+    "noImplicitReturns": true, // 関数内のすべてのコードパスが値を返すことを確認
+    "noFallthroughCasesInSwitch": true, // switch文のフォールスルーを防止
+    "noUncheckedIndexedAccess": true, // インデックスアクセスの型チェックを厳密化
+    "noImplicitOverride": true, // オーバーライドする際に明示的な override キーワードを要求
+
+    "useUnknownInCatchVariables": true, // catch節の変数型をunknownとして扱う
+    "allowUnreachableCode": false, // 到達不能なコードを禁止
+    "exactOptionalPropertyTypes": true, // オプショナルプロパティの型を厳密に
+
+    // パフォーマンス最適化
+    "skipDefaultLibCheck": true, // デフォルトライブラリのチェックをスキップ
+
+    // 実験的機能（オプション）
+    "verbatimModuleSyntax": true // import type の明示的な使用を強制
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
