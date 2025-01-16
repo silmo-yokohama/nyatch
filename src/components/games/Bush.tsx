@@ -22,7 +22,7 @@ const positionStyles: Record<BushPosition, string> = {
 export const Bush: React.FC<BushProps> = ({ position }) => {
   return (
     <div
-      className={`fixed w-[30vw] h-[30vw] bg-contain bg-no-repeat bg-center opacity-70 z-50 ${positionStyles[position]}`}
+      className={`fixed w-[30vw] h-[30vw] bg-contain bg-no-repeat bg-center opacity-70 z-[500] ${positionStyles[position]}`}
       style={{
         backgroundImage: 'url(/games/mouse/bush.png)',
       }}

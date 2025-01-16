@@ -6,15 +6,11 @@
  * - サイズ変更に対応
  * - 移動方向に応じて向きを変更（Framer Motion）
  */
-import React from 'react';
-import { motion } from 'framer-motion';
-import type { MousePosition, MouseSize } from '@/types/mouse-game';
-import styles from './Mouse.module.css';
-
-interface MouseProps {
-  position: MousePosition;
-  size: MouseSize;
-}
+import React, { useCallback, useEffect, useState } from 'react';
+import type { CSSProperties } from 'react';
+import { animated } from '@react-spring/web';
+import type { MouseSize } from '@/types/mouse-game';
+import { useMouseStalker } from '@/hooks/useMouseStalker';
 
 const sizeMap = {
   xs: 60,
@@ -24,31 +20,45 @@ const sizeMap = {
   xl: 160,
 };
 
-export const Mouse: React.FC<MouseProps> = ({ position, size }) => {
-  const baseSize = sizeMap[size];
-  // 進行方向が左向き（-90度から90度）の場合は反転しない
-  const shouldFlip = Math.abs(position.direction) > Math.PI / 2;
+const springConfig = {
+  // 変化の速さ. 大きくすると遅くなる.
+  frequency: 0.2,
+  // どのタイミングで減速するか. 大きくすると減速の開始が速くなる.
+  damping: 2,
+};
+
+const mouseStyles: CSSProperties = {
+  pointerEvents: 'none',
+  position: 'fixed',
+  zIndex: 100,
+};
+
+
+export const Mouse: React.FC<{ size: MouseSize }> = ({ size }) => {
+  const springStyles = useMouseStalker({
+    width: sizeMap[size],
+    height: sizeMap[size],
+    opacity: 1,
+    top: 0,
+    left: 0,
+  }, springConfig);
+
 
   return (
-    <motion.div
-      className={styles.mouse}
-      animate={{
-        rotate: (position.direction * 180) / Math.PI,
-      }}
-      style={{
-        width: baseSize,
-        height: baseSize,
-        top: position.y - baseSize / 2,
-        left: position.x - baseSize / 2,
-      }}
+    <animated.div
+      style={
+        {
+          ...mouseStyles,
+          ...springStyles,
+        }
+      }
     >
       <div
         className="w-full h-full bg-contain bg-no-repeat bg-center"
         style={{
           backgroundImage: 'url(/games/mouse/mouse.png)',
-          transform: shouldFlip ? 'scaleX(-1)' : undefined,
         }}
       />
-    </motion.div>
+    </animated.div>
   );
 }; 
