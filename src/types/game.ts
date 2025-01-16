@@ -6,4 +6,5 @@ export type GameMode = {
   description: string;
   icon: ElementType;
   color: string;
+  to: string;
 };
