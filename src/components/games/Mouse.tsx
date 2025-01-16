@@ -30,7 +30,7 @@ const springConfig = {
 const mouseStyles: CSSProperties = {
   pointerEvents: 'none',
   position: 'fixed',
-  zIndex: 100,
+  zIndex: 49,
 };
 
 

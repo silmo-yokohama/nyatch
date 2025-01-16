@@ -1,5 +1,5 @@
 /**
- * 草むらコンポーネント
+ * 障害物コンポーネント
  * 
  * @description
  * - 画面の四隅に配置される草むら
@@ -8,8 +8,10 @@
 import React from 'react';
 import type { BushPosition } from '@/types/mouse-game';
 
-interface BushProps {
+interface ObjectProps {
   position: BushPosition;
+  image: string;
+  size: number;
 }
 
 const positionStyles: Record<BushPosition, string> = {
@@ -20,12 +22,12 @@ const positionStyles: Record<BushPosition, string> = {
   'center': 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
 };
 
-export const Bush: React.FC<BushProps> = ({ position }) => {
+export const Object: React.FC<ObjectProps> = ({ position, image, size }) => {
   return (
     <div
-      className={`fixed w-[30vw] h-[30vw] bg-contain bg-no-repeat bg-center opacity-70 z-[500] ${positionStyles[position]}`}
+      className={`fixed w-[${size}vw] h-[${size}vw] bg-contain bg-no-repeat bg-center max-w-[500px] max-h-[500px] z-50 ${positionStyles[position]}`}
       style={{
-        backgroundImage: 'url(/games/mouse/bush.png)',
+        backgroundImage: `url(${image})`,
       }}
     />
   );

@@ -34,4 +34,4 @@ export interface MousePosition {
 /**
  * 草むらの位置を表す型
  */
-export type BushPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+export type BushPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center';
