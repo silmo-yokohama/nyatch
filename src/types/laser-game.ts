@@ -10,6 +10,8 @@ export interface LaserConfig {
   count: number;
   /** 移動速度（1-5） */
   speed: number;
+  /** レーザーの太さ（1-5） */
+  size: number;
 }
 
 /**
