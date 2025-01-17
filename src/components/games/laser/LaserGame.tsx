@@ -17,9 +17,10 @@ import { useLaserPointers } from '../../../hooks/useLaserPointers';
 import { LaserPointer } from './LaserPointer';
 import { OpeningScreen } from './OpeningScreen';
 import styles from '../../../assets/css/Laser.module.css';
+import { config as gameConfig } from './config';
 
 // ゲームの制限時間（20分）
-const GAME_DURATION_MS = 1 * 60 * 1000;
+const GAME_DURATION_MS = gameConfig.time * 60 * 1000;
 
 export const LaserGame = () => {
   // ゲームの状態を管理
@@ -31,9 +32,9 @@ export const LaserGame = () => {
 
   // ゲームの設定状態を管理
   const [config, setConfig] = useState<LaserConfig>({
-    count: 1,  // デフォルトは1個
-    speed: 3,  // デフォルトは中速
-    size: 3,   // デフォルトは中サイズ
+    count: gameConfig.count,  // デフォルトは1個
+    speed: gameConfig.speed,  // デフォルトは中速
+    size: gameConfig.size,   // デフォルトは中サイズ
   });
 
   // レーザーポインターの状態を取得

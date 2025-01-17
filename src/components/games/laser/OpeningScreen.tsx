@@ -5,8 +5,10 @@
  * 
  * @component
  */
+import Link from 'next/link';
 import type { LaserConfig } from '../../../types/laser-game';
 import styles from '../../../assets/css/Laser.module.css';
+import { config as gameConfig } from './config';
 
 interface Props {
   config: LaserConfig;
@@ -32,6 +34,10 @@ export const OpeningScreen = ({ config, onConfigChange, onStart }: Props) => {
 
   return (
     <div className={styles.opening}>
+      <Link href="/" className={styles.backLink}>
+        ← Nyatch
+      </Link>
+
       <h1 className={styles.title}>レーザーポインター</h1>
 
       <div className={styles.content}>
@@ -40,7 +46,7 @@ export const OpeningScreen = ({ config, onConfigChange, onStart }: Props) => {
             画面内を動き回る赤いレーザーポインターを追いかけよう！
           </p>
           <p className={styles.note}>
-            ゲームは20分で自動的に終了します
+            ゲームは{gameConfig.time}分で自動的に終了します
           </p>
         </div>
 
