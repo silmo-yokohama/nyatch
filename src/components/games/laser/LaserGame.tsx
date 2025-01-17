@@ -19,7 +19,7 @@ import styles from '../../../assets/css/Laser.module.css';
 export const LaserGame = () => {
   // ゲームの設定状態を管理
   const [config, setConfig] = useState<LaserConfig>({
-    count: 3,  // デフォルトは3個
+    count: 1,  // デフォルトは1個
     speed: 3,  // デフォルトは中速
     size: 3,   // デフォルトは中サイズ
   });

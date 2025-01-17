@@ -19,7 +19,7 @@ interface Props {
 
 export const LaserPointer = ({ laser, size }: Props) => {
   // サイズを1-5から5-15pxの範囲にマッピング
-  const pixelSize = size * 2 + 3;
+  const pixelSize = size * 5 + 3;
 
   return (
     <div
