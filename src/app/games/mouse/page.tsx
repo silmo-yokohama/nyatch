@@ -7,7 +7,7 @@
  */
 import React from 'react';
 import type { Metadata } from 'next';
-import { MouseGame } from '@/components/games/MouseGame';
+import { MouseGame } from '@/components/games/mouse/MouseGame';
 
 export const metadata: Metadata = {
   title: 'マウスチェイス | Nyatch',

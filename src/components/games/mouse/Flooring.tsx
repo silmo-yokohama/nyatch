@@ -12,7 +12,7 @@ export const Flooring: React.FC = () => {
         style={{ objectFit: 'cover' }}
         priority
       />
-      <div className="fixed inset-0 bg-black bg-opacity-30"></div>
+      <div className="fixed inset-0 bg-black bg-opacity-10"></div>
     </div>
   );
 };

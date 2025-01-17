@@ -11,7 +11,7 @@
  */
 import React, { useState, useCallback } from 'react';
 import type { MouseSize, MouseState } from '@/types/mouse-game';
-import { Mouse } from '@/components/games/Mouse';
+import { Mouse } from '@/components/games/mouse/Mouse';
 import { Flooring } from './Flooring';
 import { Object } from './Object';
 

@@ -25,9 +25,13 @@ const positionStyles: Record<BushPosition, string> = {
 export const Object: React.FC<ObjectProps> = ({ position, image, size }) => {
   return (
     <div
-      className={`fixed w-[${size}vw] h-[${size}vw] bg-contain bg-no-repeat bg-center max-w-[500px] max-h-[500px] z-50 ${positionStyles[position]}`}
+      className={`fixed bg-contain bg-no-repeat bg-center max-w-[500px] max-h-[500px] z-50 ${positionStyles[position]}`}
       style={{
         backgroundImage: `url(${image})`,
+        width: `${size}vw`,
+        height: `${size}vw`,
+
+        filter: 'drop-shadow(12px -6px 4px rgba(0, 0, 0, 0.25))',
       }}
     />
   );

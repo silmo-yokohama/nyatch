@@ -69,6 +69,7 @@ export const Mouse: React.FC<{ size: MouseSize }> = ({ size }) => {
         className="w-full h-full bg-contain bg-no-repeat bg-center"
         style={{
           backgroundImage: 'url(/games/mouse/mouse.png)',
+          filter: 'drop-shadow(0px 24px 8px rgba(0, 0, 0, 0.5))',
         }}
       />
     </animated.div>
