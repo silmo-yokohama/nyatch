@@ -10,11 +10,19 @@
  * @param {LaserConfig} config - レーザーポインターの設定
  * @returns {LaserState[]} 各レーザーポインターの現在の状態
  */
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import type { LaserConfig, LaserState } from '../types/laser-game';
+
+// ランダムな目標地点を生成する関数
+const generateTarget = (fieldWidth: number, fieldHeight: number) => ({
+  x: Math.random() * fieldWidth,
+  y: Math.random() * fieldHeight,
+  duration: 1000 + Math.random() * 2000, // 1-3秒
+});
 
 export const useLaserPointers = (config: LaserConfig) => {
   const [lasers, setLasers] = useState<LaserState[]>([]);
+  const targetsRef = useRef<{ [key: number]: { x: number; y: number; duration: number } }>({});
 
   // フィールドサイズを画面の1.2倍に設定（画面外への移動を可能に）
   const fieldWidth = window.innerWidth * 1.2;
@@ -25,12 +33,16 @@ export const useLaserPointers = (config: LaserConfig) => {
    * 設定された数だけランダムな位置と角度で生成する
    */
   useEffect(() => {
-    const initialLasers: LaserState[] = Array.from({ length: config.count }, (_, i) => ({
-      id: i,
-      x: Math.random() * fieldWidth,
-      y: Math.random() * fieldHeight,
-      angle: Math.random() * Math.PI * 2,
-    }));
+    const initialLasers: LaserState[] = Array.from({ length: config.count }, (_, i) => {
+      const target = generateTarget(fieldWidth, fieldHeight);
+      targetsRef.current[i] = target;
+      return {
+        id: i,
+        x: Math.random() * fieldWidth,
+        y: Math.random() * fieldHeight,
+        angle: Math.random() * Math.PI * 2,
+      };
+    });
     setLasers(initialLasers);
   }, [config.count, fieldWidth, fieldHeight]);
 
@@ -41,52 +53,61 @@ export const useLaserPointers = (config: LaserConfig) => {
   const updateLasers = useCallback(() => {
     setLasers((prevLasers) =>
       prevLasers.map((laser) => {
-        // 速度を指数関数的に増加（1: 3, 2: 5, 3: 8, 4: 12, 5: 17）
+        let target = targetsRef.current[laser.id];
+        if (!target) {
+          target = generateTarget(fieldWidth, fieldHeight);
+          targetsRef.current[laser.id] = target;
+        }
+
+        const dx = target.x - laser.x;
+        const dy = target.y - laser.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        // 目標地点に近づいたら新しい目標を設定
+        if (distance < 10) {
+          target = generateTarget(fieldWidth, fieldHeight);
+          targetsRef.current[laser.id] = target;
+        }
+
+        // 基本速度を設定（1: 3, 2: 5, 3: 8, 4: 12, 5: 17）
         const baseSpeed = Math.floor(Math.pow(config.speed, 1.5)) + 2;
 
-        // ランダムな方向変化（最大±0.5ラジアン）
-        const angleChange = (Math.random() - 0.5) * 0.5;
-
-        // 5%の確率で完全にランダムな方向に転換
-        const shouldChangeDirection = Math.random() < 0.05;
-        const newAngle = shouldChangeDirection
-          ? Math.random() * Math.PI * 2
-          : laser.angle + angleChange;
-
-        // 速度に0.8-1.2倍のランダムな変動を追加
-        const speedVariation = 0.8 + Math.random() * 0.4;
+        // 速度変動を抑える
+        const speedVariation = 0.9 + Math.random() * 0.2;
         const currentSpeed = baseSpeed * speedVariation;
 
-        // 新しい位置を計算
-        const newX = laser.x + Math.cos(newAngle) * currentSpeed;
-        const newY = laser.y + Math.sin(newAngle) * currentSpeed;
+        // 基本の移動方向を計算
+        const baseAngle = Math.atan2(dy, dx);
 
-        // 画面外に出た場合は反対側から出現（トーラス状の移動）
+        // 時間経過で変化する蛇行運動を追加
+        const now = Date.now();
+        const wiggleFrequency = 0.002; // 蛇行の頻度
+        const wiggleAmplitude = 0.3; // 蛇行の振幅
+        const wiggle = Math.sin(now * wiggleFrequency + laser.id) * wiggleAmplitude;
+
+        // ランダムなゆらぎを追加
+        const randomDeviation = (Math.random() - 0.5) * 0.1;
+
+        // 最終的な移動角度を計算
+        const moveAngle = baseAngle + wiggle + randomDeviation;
+
+        // 角度から移動量を計算
+        const moveX = Math.cos(moveAngle) * currentSpeed;
+        const moveY = Math.sin(moveAngle) * currentSpeed;
+
+        // 新しい位置を計算
+        const newX = laser.x + moveX;
+        const newY = laser.y + moveY;
+
+        // 画面外に出た場合は反対側から出現
         const x = ((newX % fieldWidth) + fieldWidth) % fieldWidth;
         const y = ((newY % fieldHeight) + fieldHeight) % fieldHeight;
-
-        // 画面端（50px以内）での特殊な挙動
-        const margin = 50;
-        const isNearEdge =
-          x < margin || x > fieldWidth - margin || y < margin || y > fieldHeight - margin;
-
-        // 画面端では20%の確率で画面中央方向に向かう
-        if (isNearEdge && Math.random() < 0.2) {
-          const centerAngle = Math.atan2(fieldHeight / 2 - y, fieldWidth / 2 - x);
-          // 中央方向±45度の範囲でランダムな角度を設定
-          return {
-            ...laser,
-            x,
-            y,
-            angle: centerAngle + ((Math.random() - 0.5) * Math.PI) / 2,
-          };
-        }
 
         return {
           ...laser,
           x,
           y,
-          angle: newAngle,
+          angle: moveAngle,
         };
       })
     );

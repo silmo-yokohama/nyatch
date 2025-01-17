@@ -54,9 +54,10 @@ export const Mouse: React.FC<{ size: MouseSize }> = ({ size }) => {
     },
   });
 
+  const AnimateDiv = animated("div")
+
   return (
-    //  @ts-ignore
-    <animated.div
+    <AnimateDiv
       style={
         {
           ...mouseStyles,
@@ -72,6 +73,6 @@ export const Mouse: React.FC<{ size: MouseSize }> = ({ size }) => {
           filter: 'drop-shadow(0px 24px 8px rgba(0, 0, 0, 0.5))',
         }}
       />
-    </animated.div>
+    </AnimateDiv>
   );
 }; 
