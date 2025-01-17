@@ -51,6 +51,8 @@ export const useLaserPointers = (config: LaserConfig) => {
    * 毎フレーム呼び出され、各レーザーの新しい位置と角度を計算する
    */
   const updateLasers = useCallback(() => {
+    const now = Date.now();
+
     setLasers((prevLasers) =>
       prevLasers.map((laser) => {
         let target = targetsRef.current[laser.id];
@@ -63,8 +65,9 @@ export const useLaserPointers = (config: LaserConfig) => {
         const dy = target.y - laser.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        // 目標地点に近づいたら新しい目標を設定
-        if (distance < 10) {
+        // 目標地点に近づいたら新しい目標を設定（ランダムな距離閾値を使用）
+        const minDistance = 10 + Math.sin(now * 0.001 + laser.id) * 5;
+        if (distance < minDistance) {
           target = generateTarget(fieldWidth, fieldHeight);
           targetsRef.current[laser.id] = target;
         }
@@ -72,24 +75,33 @@ export const useLaserPointers = (config: LaserConfig) => {
         // 基本速度を設定（1: 3, 2: 5, 3: 8, 4: 12, 5: 17）
         const baseSpeed = Math.floor(Math.pow(config.speed, 1.5)) + 2;
 
-        // 速度変動を抑える
-        const speedVariation = 0.9 + Math.random() * 0.2;
+        // 複数の周期で変動する速度
+        const timeScale = now * 0.001;
+        const speedVariation =
+          0.8 + // 基準値
+          Math.sin(timeScale + laser.id) * 0.1 + // ゆっくりとした変動
+          Math.sin(timeScale * 2 + laser.id * 2) * 0.05 + // 中程度の変動
+          Math.sin(timeScale * 4 + laser.id * 4) * 0.025; // 速い変動
+
         const currentSpeed = baseSpeed * speedVariation;
 
         // 基本の移動方向を計算
         const baseAngle = Math.atan2(dy, dx);
 
-        // 時間経過で変化する蛇行運動を追加
-        const now = Date.now();
-        const wiggleFrequency = 0.002; // 蛇行の頻度
-        const wiggleAmplitude = 0.3; // 蛇行の振幅
-        const wiggle = Math.sin(now * wiggleFrequency + laser.id) * wiggleAmplitude;
+        // 複数の周期による蛇行運動
+        const wiggle1 = Math.sin(timeScale + laser.id) * 0.2; // ゆっくりとした蛇行
+        const wiggle2 = Math.sin(timeScale * 2.5 + laser.id * 2) * 0.15; // 中程度の蛇行
+        const wiggle3 = Math.sin(timeScale * 5 + laser.id * 3) * 0.1; // 速い蛇行
 
-        // ランダムなゆらぎを追加
-        const randomDeviation = (Math.random() - 0.5) * 0.1;
+        // カオス的な動きを追加
+        const chaos = Math.sin(Math.tan(timeScale * 0.1 + laser.id)) * 0.1;
+
+        // ランダムなゆらぎ（距離に応じて強さを変える）
+        const randomStrength = Math.min(0.2, distance / 100); // 目標に近いほど揺れが小さく
+        const randomDeviation = (Math.random() - 0.5) * randomStrength;
 
         // 最終的な移動角度を計算
-        const moveAngle = baseAngle + wiggle + randomDeviation;
+        const moveAngle = baseAngle + wiggle1 + wiggle2 + wiggle3 + chaos + randomDeviation;
 
         // 角度から移動量を計算
         const moveX = Math.cos(moveAngle) * currentSpeed;
