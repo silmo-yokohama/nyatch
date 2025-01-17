@@ -15,6 +15,7 @@ import type { LaserConfig, LaserState } from '../types/laser-game';
 
 /**
  * 動きの制御に使用する定数
+ * @constant
  */
 const MOVEMENT_PARAMS = {
   // 基本的な動きの制御
@@ -44,7 +45,10 @@ const MOVEMENT_PARAMS = {
 
 /**
  * ランダムな目標地点を生成する関数
- * duration: 1-3秒のランダムな値（将来的な時間ベースの移動のため）
+ *
+ * @param {number} fieldWidth - フィールドの幅
+ * @param {number} fieldHeight - フィールドの高さ
+ * @returns {{ x: number; y: number; duration: number }} 生成された目標地点の座標と持続時間
  */
 const generateTarget = (fieldWidth: number, fieldHeight: number) => ({
   x: Math.random() * fieldWidth,
@@ -54,7 +58,11 @@ const generateTarget = (fieldWidth: number, fieldHeight: number) => ({
 
 /**
  * 速度変動を計算する関数
- * 3つの異なる周期の正弦波を合成して複雑な速度変化を生成
+ * 3つの異なる周期の正弦波を合成して複雑な速度変化を生成する
+ *
+ * @param {number} timeScale - 現在の時間スケール（秒単位）
+ * @param {number} laserId - レーザーの一意のID
+ * @returns {number} 計算された速度変動値（基準値からの変動）
  */
 const calculateSpeedVariation = (timeScale: number, laserId: number) => {
   const { SPEED_BASE, SPEED_SLOW_AMP, SPEED_MED_AMP, SPEED_FAST_AMP } = MOVEMENT_PARAMS;
@@ -68,7 +76,11 @@ const calculateSpeedVariation = (timeScale: number, laserId: number) => {
 
 /**
  * 蛇行運動を計算する関数
- * 3つの異なる周期の正弦波を合成して複雑な蛇行を生成
+ * 3つの異なる周期の正弦波を合成して複雑な蛇行を生成する
+ *
+ * @param {number} timeScale - 現在の時間スケール（秒単位）
+ * @param {number} laserId - レーザーの一意のID
+ * @returns {number} 計算された蛇行角度（ラジアン）
  */
 const calculateWiggle = (timeScale: number, laserId: number) => {
   const { WIGGLE_SLOW, WIGGLE_MED, WIGGLE_FAST } = MOVEMENT_PARAMS;
@@ -79,6 +91,14 @@ const calculateWiggle = (timeScale: number, laserId: number) => {
   );
 };
 
+/**
+ * レーザーポインターの動きを制御するカスタムフック
+ *
+ * @param {LaserConfig} config - レーザーの設定
+ * @param {number} config.count - 生成するレーザーの数
+ * @param {number} config.speed - レーザーの基本速度（1-5）
+ * @returns {LaserState[]} 更新されたレーザーの状態の配列
+ */
 export const useLaserPointers = (config: LaserConfig) => {
   const [lasers, setLasers] = useState<LaserState[]>([]);
   const targetsRef = useRef<{ [key: number]: { x: number; y: number; duration: number } }>({});
@@ -88,7 +108,10 @@ export const useLaserPointers = (config: LaserConfig) => {
   const fieldHeight = window.innerHeight * MOVEMENT_PARAMS.FIELD_SCALE;
 
   /**
-   * レーザーポインターの初期状態を生成
+   * レーザーポインターの初期状態を生成するエフェクト
+   *
+   * @effect
+   * @dependencies [config.count, fieldWidth, fieldHeight]
    */
   useEffect(() => {
     const initialLasers: LaserState[] = Array.from({ length: config.count }, (_, i) => {
@@ -105,7 +128,16 @@ export const useLaserPointers = (config: LaserConfig) => {
   }, [config.count, fieldWidth, fieldHeight]);
 
   /**
-   * レーザーポインターの位置を更新
+   * レーザーポインターの位置を更新するコールバック関数
+   * 各フレームで呼び出され、以下の処理を行う：
+   * - 目標地点への移動
+   * - 速度の動的な調整
+   * - 蛇行運動の適用
+   * - カオス的な動きの追加
+   * - 距離に応じたランダム性の適用
+   *
+   * @callback
+   * @returns {void}
    */
   const updateLasers = useCallback(() => {
     const now = Date.now();
@@ -166,7 +198,12 @@ export const useLaserPointers = (config: LaserConfig) => {
     );
   }, [config.speed, fieldWidth, fieldHeight]);
 
-  // アニメーションフレームでの更新
+  /**
+   * アニメーションフレームでの更新を制御するエフェクト
+   *
+   * @effect
+   * @dependencies [updateLasers]
+   */
   useEffect(() => {
     let animationFrameId: number;
     const animate = () => {
