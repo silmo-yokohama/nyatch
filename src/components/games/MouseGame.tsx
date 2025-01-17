@@ -9,8 +9,8 @@
  * - 移動時の足跡表示
  * - 草むらとの連携
  */
-import React, { useState } from 'react';
-import type { MouseState } from '@/types/mouse-game';
+import React, { useState, useCallback } from 'react';
+import type { MouseSize, MouseState } from '@/types/mouse-game';
 import { Mouse } from '@/components/games/Mouse';
 import { Flooring } from './Flooring';
 import { Object } from './Object';
@@ -18,6 +18,29 @@ import { Object } from './Object';
 export const MouseGame: React.FC = () => {
   // 状態管理
   const [gameState, setGameState] = useState<MouseState>('waiting');
+  const [mouseSize, setMouseSize] = useState<MouseSize>('md');
+
+  // マウスサイズの変更処理
+  const handleWheel = useCallback((event: WheelEvent) => {
+    const sizes: MouseSize[] = ['xs', 'sm', 'md', 'lg', 'xl'];
+    const currentIndex = sizes.indexOf(mouseSize);
+
+    if (event.deltaY > 0 && currentIndex > 0) {
+      // 下スクロールで小さく
+      setMouseSize(sizes[currentIndex - 1] as MouseSize);
+    } else if (event.deltaY < 0 && currentIndex < sizes.length - 1) {
+      // 上スクロールで大きく
+      setMouseSize(sizes[currentIndex + 1] as MouseSize);
+    }
+  }, [mouseSize]);
+
+  // スクロールイベントの登録
+  React.useEffect(() => {
+    if (gameState === 'playing') {
+      window.addEventListener('wheel', handleWheel);
+      return () => window.removeEventListener('wheel', handleWheel);
+    }
+  }, [gameState, handleWheel]);
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-white cursor-none">
@@ -31,7 +54,7 @@ export const MouseGame: React.FC = () => {
 
       {/* ネズミ */}
       {gameState === 'playing' && (
-        <Mouse size="xl" />
+        <Mouse size={mouseSize} />
       )}
 
       {/* スタート画面 */}

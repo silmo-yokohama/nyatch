@@ -3,21 +3,21 @@
  * 
  * @description
  * - マウスカーソルに追従するネズミを表示（CSS transition）
- * - サイズ変更に対応
+ * - サイズ変更に対応（react-spring）
  * - 移動方向に応じて向きを変更（Framer Motion）
  */
-import React, { useCallback, useEffect, useState } from 'react';
+import React from 'react';
 import type { CSSProperties } from 'react';
-import { animated } from '@react-spring/web';
+import { animated, useSpring } from '@react-spring/web';
 import type { MouseSize } from '@/types/mouse-game';
 import { useMouseStalker } from '@/hooks/useMouseStalker';
 
 const sizeMap = {
-  xs: 60,
-  sm: 80,
-  md: 100,
-  lg: 120,
-  xl: 160,
+  xs: 120,
+  sm: 180,
+  md: 220,
+  lg: 260,
+  xl: 300,
 };
 
 const springConfig = {
@@ -35,7 +35,8 @@ const mouseStyles: CSSProperties = {
 
 
 export const Mouse: React.FC<{ size: MouseSize }> = ({ size }) => {
-  const springStyles = useMouseStalker({
+  // マウス追従のアニメーション
+  const stalkerStyles = useMouseStalker({
     width: sizeMap[size],
     height: sizeMap[size],
     opacity: 1,
@@ -43,13 +44,24 @@ export const Mouse: React.FC<{ size: MouseSize }> = ({ size }) => {
     left: 0,
   }, springConfig);
 
+  // サイズ変更のアニメーション
+  const sizeStyles = useSpring({
+    width: sizeMap[size],
+    height: sizeMap[size],
+    config: {
+      tension: 300,
+      friction: 20,
+    },
+  });
 
   return (
+    //  @ts-ignore
     <animated.div
       style={
         {
           ...mouseStyles,
-          ...springStyles,
+          ...stalkerStyles,
+          ...sizeStyles,
         }
       }
     >
