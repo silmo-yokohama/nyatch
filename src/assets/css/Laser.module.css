@@ -24,13 +24,30 @@
   left: 50%;
   transform: translateX(-50%);
   background-color: rgba(30, 30, 30, 0.8);
-  padding: 1rem 1.5rem;
+  padding: 1rem 1.5rem 3.25rem;
   border-radius: 12px;
   display: flex;
   gap: 1.5rem;
   align-items: center;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.3s ease-in-out;
+}
+
+.configPanelHidden {
+  transform: translate(-50%, calc(100% + 20px));
+}
+
+/* タイマーとトグルボタンのコンテナ */
+.timerContainer {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  z-index: 2;
 }
 
 .configLabel {
@@ -219,9 +236,43 @@
   color: white;
   font-size: 1.1rem;
   font-weight: 500;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(30, 30, 30, 0.8);
   padding: 0.5rem 1rem;
   border-radius: 6px;
   min-width: 120px;
   text-align: center;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 設定パネルトグルボタン */
+.toggleButton {
+  background-color: rgba(30, 30, 30, 0.8);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+}
+
+.toggleButton:hover {
+  background-color: rgba(40, 40, 40, 0.8);
+  transform: translateY(-1px);
+}
+
+.toggleButton svg {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s ease;
+}
+
+.toggleButtonRotated svg {
+  transform: rotate(180deg);
 }

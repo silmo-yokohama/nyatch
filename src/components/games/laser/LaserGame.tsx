@@ -11,6 +11,7 @@
  * @component
  */
 import { useState, useEffect } from 'react';
+import { ChevronUp } from 'lucide-react';
 import type { LaserConfig, GameState } from '../../../types/laser-game';
 import { useLaserPointers } from '../../../hooks/useLaserPointers';
 import { LaserPointer } from './LaserPointer';
@@ -18,13 +19,15 @@ import { OpeningScreen } from './OpeningScreen';
 import styles from '../../../assets/css/Laser.module.css';
 
 // ゲームの制限時間（20分）
-const GAME_DURATION_MS = 20 * 60 * 1000;
+const GAME_DURATION_MS = 1 * 60 * 1000;
 
 export const LaserGame = () => {
   // ゲームの状態を管理
   const [gameState, setGameState] = useState<GameState>('opening');
   // 残り時間を管理（ミリ秒）
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION_MS);
+  // 設定パネルの表示状態を管理
+  const [isConfigVisible, setIsConfigVisible] = useState(true);
 
   // ゲームの設定状態を管理
   const [config, setConfig] = useState<LaserConfig>({
@@ -95,13 +98,22 @@ export const LaserGame = () => {
         <LaserPointer key={laser.id} laser={laser} size={config.size} />
       ))}
 
-      {/* 設定パネル */}
-      <div className={styles.configPanel}>
-        {/* タイマー表示 */}
+      {/* タイマーとトグルボタン */}
+      <div className={styles.timerContainer}>
         <div className={styles.timer}>
           残り時間: {formatTime(timeLeft)}
         </div>
+        <button
+          onClick={() => setIsConfigVisible(prev => !prev)}
+          className={`${styles.toggleButton} ${!isConfigVisible ? styles.toggleButtonRotated : ''}`}
+          aria-label="設定パネルの表示/非表示"
+        >
+          <ChevronUp />
+        </button>
+      </div>
 
+      {/* 設定パネル */}
+      <div className={`${styles.configPanel} ${!isConfigVisible ? styles.configPanelHidden : ''}`}>
         <label className={styles.configLabel}>
           レーザー数
           <input
