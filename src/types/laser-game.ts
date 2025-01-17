@@ -5,6 +5,13 @@
  */
 
 /**
+ * ゲームの状態を表す型
+ *
+ * @type GameState
+ */
+export type GameState = 'opening' | 'playing' | 'finished';
+
+/**
  * レーザーポインターの設定情報を表す型
  *
  * @interface LaserConfig

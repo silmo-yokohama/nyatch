@@ -10,13 +10,22 @@
  * 
  * @component
  */
-import { useState } from 'react';
-import type { LaserConfig } from '../../../types/laser-game';
+import { useState, useEffect } from 'react';
+import type { LaserConfig, GameState } from '../../../types/laser-game';
 import { useLaserPointers } from '../../../hooks/useLaserPointers';
 import { LaserPointer } from './LaserPointer';
+import { OpeningScreen } from './OpeningScreen';
 import styles from '../../../assets/css/Laser.module.css';
 
+// ゲームの制限時間（20分）
+const GAME_DURATION_MS = 20 * 60 * 1000;
+
 export const LaserGame = () => {
+  // ゲームの状態を管理
+  const [gameState, setGameState] = useState<GameState>('opening');
+  // 残り時間を管理（ミリ秒）
+  const [timeLeft, setTimeLeft] = useState(GAME_DURATION_MS);
+
   // ゲームの設定状態を管理
   const [config, setConfig] = useState<LaserConfig>({
     count: 1,  // デフォルトは1個
@@ -28,31 +37,56 @@ export const LaserGame = () => {
   const lasers = useLaserPointers(config);
 
   /**
-   * レーザーポインターの数を変更する
-   * 入力値を1-5の範囲に制限する
+   * ゲームを開始する
+   * 状態を'playing'に変更し、タイマーをリセット
    */
-  const handleCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const count = Math.min(5, Math.max(1, parseInt(e.target.value) || 1));
-    setConfig(prev => ({ ...prev, count }));
+  const handleGameStart = () => {
+    setGameState('playing');
+    setTimeLeft(GAME_DURATION_MS);
   };
 
   /**
-   * 移動速度を変更する
-   * 入力値を1-5の範囲に制限する
+   * ゲームを終了する
+   * 状態を'opening'に戻す
    */
-  const handleSpeedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const speed = Math.min(5, Math.max(1, parseInt(e.target.value) || 1));
-    setConfig(prev => ({ ...prev, speed }));
+  const handleGameEnd = () => {
+    setGameState('opening');
   };
 
-  /**
-   * レーザーの太さを変更する
-   * 入力値を1-5の範囲に制限する
-   */
-  const handleSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const size = Math.min(5, Math.max(1, parseInt(e.target.value) || 1));
-    setConfig(prev => ({ ...prev, size }));
+  // タイマーの更新を管理
+  useEffect(() => {
+    if (gameState !== 'playing') return;
+
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1000) { // 1秒以下になったら終了
+          clearInterval(timer);
+          handleGameEnd();
+          return 0;
+        }
+        return prev - 1000;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [gameState]);
+
+  // 残り時間を分:秒形式に変換
+  const formatTime = (ms: number) => {
+    const minutes = Math.floor(ms / 60000);
+    const seconds = Math.floor((ms % 60000) / 1000);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
+
+  if (gameState === 'opening') {
+    return (
+      <OpeningScreen
+        config={config}
+        onConfigChange={setConfig}
+        onStart={handleGameStart}
+      />
+    );
+  }
 
   return (
     <div className={styles.container}>
@@ -63,40 +97,48 @@ export const LaserGame = () => {
 
       {/* 設定パネル */}
       <div className={styles.configPanel}>
+        {/* タイマー表示 */}
+        <div className={styles.timer}>
+          残り時間: {formatTime(timeLeft)}
+        </div>
+
         <label className={styles.configLabel}>
-          レーザー数 (1-5):
+          レーザー数
           <input
-            type="number"
+            type="range"
             min="1"
             max="5"
             value={config.count}
-            onChange={handleCountChange}
-            className={styles.configInput}
+            onChange={e => setConfig(prev => ({ ...prev, count: Number(e.target.value) }))}
+            className={styles.settingSlider}
           />
+          <span className={styles.settingValue}>{config.count}</span>
         </label>
 
         <label className={styles.configLabel}>
-          速度 (1-5):
+          速度
           <input
-            type="number"
+            type="range"
             min="1"
             max="5"
             value={config.speed}
-            onChange={handleSpeedChange}
-            className={styles.configInput}
+            onChange={e => setConfig(prev => ({ ...prev, speed: Number(e.target.value) }))}
+            className={styles.settingSlider}
           />
+          <span className={styles.settingValue}>{config.speed}</span>
         </label>
 
         <label className={styles.configLabel}>
-          太さ (1-5):
+          太さ
           <input
-            type="number"
+            type="range"
             min="1"
             max="5"
             value={config.size}
-            onChange={handleSizeChange}
-            className={styles.configInput}
+            onChange={e => setConfig(prev => ({ ...prev, size: Number(e.target.value) }))}
+            className={styles.settingSlider}
           />
+          <span className={styles.settingValue}>{config.size}</span>
         </label>
       </div>
     </div>

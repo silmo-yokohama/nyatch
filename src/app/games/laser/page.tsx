@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 
 export default function LaserGamePage() {
   return (
-    <main className="w-full h-screen">
+    <main className="w-full h-screen bg-black">
       <LaserGame />
     </main>
   );
