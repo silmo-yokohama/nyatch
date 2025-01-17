@@ -46,11 +46,10 @@ export const MouseGame: React.FC = () => {
     <div className="fixed inset-0 overflow-hidden bg-white cursor-none">
       <Flooring />
       {/* 草むら */}
-      <Object position="center" image="/games/mouse/stone.png" size={30} />
+      <Object position="bottom-right" image="/games/mouse/stone.png" size={30} />
       <Object position="top-left" image="/games/mouse/bush.png" size={30} />
       <Object position="top-right" image="/games/mouse/tree_bird.png" size={30} />
       <Object position="bottom-left" image="/games/mouse/tree.png" size={30} />
-      <Object position="bottom-right" image="/games/mouse/bush.png" size={30} />
 
       {/* ネズミ */}
       {gameState === 'playing' && (
@@ -59,15 +58,37 @@ export const MouseGame: React.FC = () => {
 
       {/* スタート画面 */}
       {gameState === 'waiting' && (
-        <div className="absolute inset-0 h-full w-full flex flex-col items-center justify-center bg-white text-black bg-opacity-80 cursor-auto z-50">
-          <h1 className="text-2xl font-bold mb-4 text-black">マウスチェイス</h1>
-          <p className="mb-4 text-black">全画面表示を推奨します</p>
-          <button
-            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-            onClick={() => setGameState('playing')}
-          >
-            スタート
-          </button>
+        <div className="absolute inset-0 h-full w-full flex flex-col items-center justify-center bg-white/90 text-black cursor-auto z-50">
+          <div className="max-w-md w-full p-8 rounded-2xl bg-white shadow-lg transform transition-all duration-500 hover:scale-105">
+            <h1 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              マウスチェイス
+            </h1>
+
+            <div className="space-y-4 mb-8">
+              <div className="text-gray-700">
+                <h2 className="font-bold mb-2 text-lg">遊び方</h2>
+                <ul className="list-disc list-inside space-y-2">
+                  <li>マウスカーソルを動かすとネズミが追いかけてきます</li>
+                  <li>右クリックでネズミが逃げ出します</li>
+                  <li>マウスホイールでネズミのサイズを変更できます</li>
+                  <li>草むらに隠れたりして遊んでみましょう</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="text-center">
+              <button
+                className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg
+                          hover:from-blue-600 hover:to-purple-600 transform transition-all duration-300
+                          hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50
+                          font-bold text-lg shadow-lg"
+                onClick={() => setGameState('playing')}
+              >
+                ゲームスタート
+              </button>
+              <p className="mt-4 text-sm text-gray-500">※ 全画面表示を推奨します</p>
+            </div>
+          </div>
         </div>
       )}
     </div>
