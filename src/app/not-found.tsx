@@ -6,8 +6,20 @@
  * - ホームページへの戻りリンクを提供
  */
 
-import NotFoundAnimation from '@/components/lotties/NotFoundAnimation'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
+
+// アニメーションコンポーネントを動的にインポート
+const NotFoundAnimation = dynamic(
+  () => import('@/components/lotties/NotFoundAnimation'),
+  {
+    loading: () => (
+      <div className="w-96 h-96 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    )
+  }
+)
 
 export default function NotFound() {
   return (
