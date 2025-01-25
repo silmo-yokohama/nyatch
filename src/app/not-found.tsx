@@ -1,3 +1,4 @@
+"use client"
 /**
  * 404 Not Found ページコンポーネント
  * 
