@@ -8,6 +8,7 @@
 
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
+import { Suspense } from 'react'
 
 // アニメーションコンポーネントを動的にインポート
 const NotFoundAnimation = dynamic(
@@ -28,7 +29,13 @@ export default function NotFound() {
         <h1 className="text-2xl font-semibold text-gray-600 mb-4">
           ページが見つかりません
         </h1>
-        <NotFoundAnimation />
+        <Suspense fallback={
+          <div className="w-96 h-96 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        }>
+          <NotFoundAnimation />
+        </Suspense>
         <p className="text-gray-500 mb-8">
           お探しのページは存在しないか、移動した可能性があります。
         </p>
