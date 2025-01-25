@@ -9,7 +9,7 @@
  * - 移動時の足跡表示
  * - 草むらとの連携
  */
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import type { MouseSize, MouseState } from '@/types/mouse-game';
 import { Mouse } from '@/components/games/mouse/Mouse';
 import { Flooring } from './Flooring';
@@ -35,11 +35,12 @@ export const MouseGame: React.FC = () => {
   }, [mouseSize]);
 
   // スクロールイベントの登録
-  React.useEffect(() => {
+  useEffect(() => {
     if (gameState === 'playing') {
       window.addEventListener('wheel', handleWheel);
       return () => window.removeEventListener('wheel', handleWheel);
     }
+    return () => { }; // 空のクリーンアップ関数を返す
   }, [gameState, handleWheel]);
 
   return (
