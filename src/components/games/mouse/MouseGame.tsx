@@ -36,11 +36,12 @@ export const MouseGame: React.FC = () => {
 
   // スクロールイベントの登録
   useEffect(() => {
-    if (gameState === 'playing') {
-      window.addEventListener('wheel', handleWheel);
-      return () => window.removeEventListener('wheel', handleWheel);
+    if (typeof window === 'undefined' || gameState !== 'playing') {
+      return () => { };
     }
-    return () => { }; // 空のクリーンアップ関数を返す
+
+    window.addEventListener('wheel', handleWheel);
+    return () => window.removeEventListener('wheel', handleWheel);
   }, [gameState, handleWheel]);
 
   return (

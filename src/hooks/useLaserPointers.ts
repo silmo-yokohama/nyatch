@@ -102,30 +102,48 @@ const calculateWiggle = (timeScale: number, laserId: number) => {
 export const useLaserPointers = (config: LaserConfig) => {
   const [lasers, setLasers] = useState<LaserState[]>([]);
   const targetsRef = useRef<{ [key: number]: { x: number; y: number; duration: number } }>({});
+  const [fieldSize, setFieldSize] = useState({ width: 0, height: 0 });
 
-  // フィールドサイズを画面の1.2倍に設定
-  const fieldWidth = window.innerWidth * MOVEMENT_PARAMS.FIELD_SCALE;
-  const fieldHeight = window.innerHeight * MOVEMENT_PARAMS.FIELD_SCALE;
+  // フィールドサイズを画面サイズに基づいて設定
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const updateFieldSize = () => {
+      setFieldSize({
+        width: window.innerWidth * MOVEMENT_PARAMS.FIELD_SCALE,
+        height: window.innerHeight * MOVEMENT_PARAMS.FIELD_SCALE,
+      });
+    };
+
+    // 初期サイズを設定
+    updateFieldSize();
+
+    // リサイズイベントのリスナーを追加
+    window.addEventListener('resize', updateFieldSize);
+    return () => window.removeEventListener('resize', updateFieldSize);
+  }, []);
 
   /**
    * レーザーポインターの初期状態を生成するエフェクト
    *
    * @effect
-   * @dependencies [config.count, fieldWidth, fieldHeight]
+   * @dependencies [config.count, fieldSize]
    */
   useEffect(() => {
+    if (fieldSize.width === 0 || fieldSize.height === 0) return;
+
     const initialLasers: LaserState[] = Array.from({ length: config.count }, (_, i) => {
-      const target = generateTarget(fieldWidth, fieldHeight);
+      const target = generateTarget(fieldSize.width, fieldSize.height);
       targetsRef.current[i] = target;
       return {
         id: i,
-        x: Math.random() * fieldWidth,
-        y: Math.random() * fieldHeight,
+        x: Math.random() * fieldSize.width,
+        y: Math.random() * fieldSize.height,
         angle: Math.random() * Math.PI * 2,
       };
     });
     setLasers(initialLasers);
-  }, [config.count, fieldWidth, fieldHeight]);
+  }, [config.count, fieldSize]);
 
   /**
    * レーザーポインターの位置を更新するコールバック関数
@@ -140,6 +158,8 @@ export const useLaserPointers = (config: LaserConfig) => {
    * @returns {void}
    */
   const updateLasers = useCallback(() => {
+    if (fieldSize.width === 0 || fieldSize.height === 0) return;
+
     const now = Date.now();
     const timeScale = now * 0.001; // ミリ秒を秒に変換
 
@@ -148,7 +168,7 @@ export const useLaserPointers = (config: LaserConfig) => {
         // 目標地点の取得または生成
         let target = targetsRef.current[laser.id];
         if (!target) {
-          target = generateTarget(fieldWidth, fieldHeight);
+          target = generateTarget(fieldSize.width, fieldSize.height);
           targetsRef.current[laser.id] = target;
         }
 
@@ -161,7 +181,7 @@ export const useLaserPointers = (config: LaserConfig) => {
         const { MIN_DISTANCE, DISTANCE_VARIATION } = MOVEMENT_PARAMS;
         const minDistance = MIN_DISTANCE + Math.sin(timeScale + laser.id) * DISTANCE_VARIATION;
         if (distance < minDistance) {
-          target = generateTarget(fieldWidth, fieldHeight);
+          target = generateTarget(fieldSize.width, fieldSize.height);
           targetsRef.current[laser.id] = target;
         }
 
@@ -190,13 +210,13 @@ export const useLaserPointers = (config: LaserConfig) => {
         const moveY = Math.sin(moveAngle) * currentSpeed;
 
         // 新しい位置（画面外に出た場合は反対側から出現）
-        const x = (((laser.x + moveX) % fieldWidth) + fieldWidth) % fieldWidth;
-        const y = (((laser.y + moveY) % fieldHeight) + fieldHeight) % fieldHeight;
+        const x = (((laser.x + moveX) % fieldSize.width) + fieldSize.width) % fieldSize.width;
+        const y = (((laser.y + moveY) % fieldSize.height) + fieldSize.height) % fieldSize.height;
 
         return { ...laser, x, y, angle: moveAngle };
       })
     );
-  }, [config.speed, fieldWidth, fieldHeight]);
+  }, [config.speed, fieldSize]);
 
   /**
    * アニメーションフレームでの更新を制御するエフェクト
